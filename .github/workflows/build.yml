@@ -13,14 +13,82 @@ jobs:
       - name: Build
         run: |
           mkdir -p app/src/main/java/com/marchwar/meet app/src/main/res/layout app/src/main/res/values
-          echo "include ':app'" > settings.gradle
-          echo "buildscript { repositories { google(); mavenCentral() } dependencies { classpath 'com.android.tools.build:gradle:8.2.2'; classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22' } } allprojects { repositories { google(); mavenCentral() } }" > build.gradle
-          printf "plugins {\n id 'com.android.application'\n id 'org.jetbrains.kotlin.android'\n}\nandroid {\n namespace 'com.marchwar.meet'\n compileSdk 34\n defaultConfig {\n  applicationId 'com.marchwar.meet'\n  minSdk 24\n  targetSdk 34\n  versionCode 1\n  versionName '1.0'\n }\n buildTypes { release { minifyEnabled false } }\n}\ndependencies {\n implementation 'androidx.core:core-ktx:1.12.0'\n implementation 'androidx.appcompat:appcompat:1.6.1'\n}\n" > app/build.gradle
-          printf "<manifest xmlns:android='http://schemas.android.com/apk/res/android'><application android:label='Marchwar Meet'><activity android:name='.MainActivity' android:exported='true'><intent-filter><action android:name='android.intent.action.MAIN'/><category android:name='android.intent.category.LAUNCHER'/></intent-filter></activity></application></manifest>" > app/src/main/AndroidManifest.xml
-          printf "<resources><string name='app_name'>Marchwar Meet</string></resources>" > app/src/main/res/values/strings.xml
-          printf "<LinearLayout xmlns:android='http://schemas.android.com/apk/res/android' android:layout_width='match_parent' android:layout_height='match_parent' android:gravity='center' android:orientation='vertical'><TextView android:layout_width='wrap_content' android:layout_height='wrap_content' android:text='Jai Marchwar' android:textSize='24sp'/><Button android:id='@+id/btn' android:layout_width='wrap_content' android:layout_height='wrap_content' android:text='Click Me'/></LinearLayout>" > app/src/main/res/layout/activity_main.xml
-          printf "package com.marchwar.meet\nimport android.os.Bundle\nimport androidx.appcompat.app.AppCompatActivity\nimport android.widget.Button\nimport android.widget.Toast\nclass MainActivity: AppCompatActivity() {\n override fun onCreate(savedInstanceState: Bundle?) {\n  super.onCreate(savedInstanceState)\n  setContentView(R.layout.activity_main)\n  findViewById<Button>(R.id.btn).setOnClickListener { Toast.makeText(this, \"Jai Marchwar!\", Toast.LENGTH_LONG).show() }\n }\n}\n" > app/src/main/java/com/marchwar/meet/MainActivity.kt
-          gradle assembleDebug
+          cat > settings.gradle <<'E1'
+          include ':app'
+          E1
+          cat > build.gradle <<'E2'
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.2.2'
+                  classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          E2
+          cat > app/build.gradle <<'E3'
+          apply plugin: 'com.android.application'
+          apply plugin: 'org.jetbrains.kotlin.android'
+          android {
+              namespace 'com.marchwar.meet'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.marchwar.meet"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                  }
+              }
+          }
+          dependencies {
+              implementation 'androidx.core:core-ktx:1.12.0'
+              implementation 'androidx.appcompat:appcompat:1.6.1'
+          }
+          E3
+          cat > app/src/main/AndroidManifest.xml <<'E4'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <application android:label="Marchwar Meet">
+                  <activity android:name=".MainActivity" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          E4
+          echo '<resources><string name="app_name">Marchwar Meet</string></resources>' > app/src/main/res/values/strings.xml
+          echo '<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jai Marchwar" android:textSize="24sp"/><Button android:id="@+id/btn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Click"/></LinearLayout>' > app/src/main/res/layout/activity_main.xml
+          cat > app/src/main/java/com/marchwar/meet/MainActivity.kt <<'E5'
+          package com.marchwar.meet
+          import android.os.Bundle
+          import androidx.appcompat.app.AppCompatActivity
+          import android.widget.Button
+          import android.widget.Toast
+          class MainActivity: AppCompatActivity() {
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  setContentView(R.layout.activity_main)
+                  findViewById<Button>(R.id.btn).setOnClickListener {
+                      Toast.makeText(this, "Jai Marchwar!", Toast.LENGTH_LONG).show()
+                  }
+              }
+          }
+          E5
+          gradle assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: APK
